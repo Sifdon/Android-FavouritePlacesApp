@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "33549304510",
+    "firebase_url": "https://favouriteplacesapp.firebaseio.com",
+    "project_id": "favouriteplacesapp",
+    "storage_bucket": "favouriteplacesapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:33549304510:android:cf680a4d58d0c6a0",
+        "android_client_info": {
+          "package_name": "com.example.alicja.favouriteplacesapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "33549304510-jbn3fjj96fkpold05rbmuilhiipq1ho6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.alicja.favouriteplacesapp",
+            "certificate_hash": "afe17a86cbf9adf750ce825f8733479f6e0ab396"
+          }
+        },
+        {
+          "client_id": "33549304510-cufb2ubmg5e98bhtp2icer2vt0ck4q2q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUeASTRmbZVQEUIXWsBJjXLmHWjpb_HV0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "33549304510-cufb2ubmg5e98bhtp2icer2vt0ck4q2q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
