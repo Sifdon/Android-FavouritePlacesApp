@@ -11,9 +11,11 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.alicja.favouriteplacesapp.utils.NotificationUtils;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryDataEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -29,6 +31,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -219,15 +222,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addCircle(new CircleOptions()
         .center(favouritePlace)
         .radius(500)
-        .strokeColor(Color.parseColor("#C44F5F"))
-        .fillColor(Color.parseColor("#E0A3A4"))
+        .strokeColor(getColor(R.color.favouriteMarkerStrokeColor))
+        .fillColor(getColor(R.color.favouriteMarkerFillColor))
         .strokeWidth(5.0f));
 
         Marker marker = mMap.addMarker(new MarkerOptions().position(favouritePlace).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_beenhere_black_24dp))
                 .title("FavouritePlace"));
 
-//         Add geoquery to this location
-//        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(favouritePlace.latitude, favouritePlace.longitude), 0.5f);
+        // Add geoquery to this location
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(favouritePlace.latitude, favouritePlace.longitude), 0.5f);
+
+        // Add listeners for managing notifications
+        geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+            @Override
+            public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
+                NotificationUtils.showNotification(getApplicationContext(), location.toString());
+            }
+
+            @Override
+            public void onDataExited(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onDataMoved(DataSnapshot dataSnapshot, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+                Log.d(TAG, "onGeoQueryError: " + error.getMessage());
+
+            }
+        });
 
 
 
