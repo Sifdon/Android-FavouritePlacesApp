@@ -2,7 +2,6 @@ package com.example.alicja.favouriteplacesapp;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +10,8 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -22,7 +23,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -38,25 +43,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
-    private Location lastLocation;
+    private android.location.Location lastLocation;
 
     private static int UPDATE_INTERVAL = 5000;
     private static int FASTEST_INTERVAL = 3000;
     private static int DISPLACEMENT = 10;
+
+    private Marker currentLocationMarker;
+    private Location currentLocation;
+
+
+    //Firebase & Geofire
+    private DatabaseReference firebaseLocationsDB;
+    private GeoFire geoFire;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
         // Show Current Location on the map
         showCurrentLocation();
+
+        // Connect with Firebase
+        firebaseLocationsDB = FirebaseDatabase.getInstance().getReference("Locations");
+        geoFire = new GeoFire(firebaseLocationsDB);
+
     }
 
     private boolean checkLocationPermissionsGranted() {
@@ -111,8 +129,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         if (lastLocation != null) {
-            double latitude = lastLocation.getLatitude();
-            double longitude = lastLocation.getLongitude();
+            final double latitude = lastLocation.getLatitude();
+            final double longitude = lastLocation.getLongitude();
+
+            // Save to Firebase DB
+            geoFire.setLocation("CurrentLocation", new GeoLocation(latitude, longitude),
+                    new GeoFire.CompletionListener() {
+                        @Override
+                        public void onComplete(String key, DatabaseError error) {
+                            // Once current location in saved - update marker
+                            if(currentLocationMarker != null) {
+                                currentLocationMarker.remove();
+                            }
+
+                            currentLocationMarker = mMap
+                                    .addMarker(new MarkerOptions().position(new LatLng(latitude, longitude))
+                                    .title("Current Location"));
+
+                            // Adjust camera
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 12.0f));
+                        }
+                    });
+
+
 
             Log.d(TAG, String.format("displayLocation: location changed to %f / %f ", latitude, longitude));
         } else {
@@ -166,10 +205,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        // Add a marker in Sydney and move the camera
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     @Override
@@ -199,7 +238,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(android.location.Location location) {
 
         lastLocation = location;
         displayLocation();
