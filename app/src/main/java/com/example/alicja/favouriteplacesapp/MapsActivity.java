@@ -2,6 +2,7 @@ package com.example.alicja.favouriteplacesapp;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -22,6 +24,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -132,6 +136,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             final double latitude = lastLocation.getLatitude();
             final double longitude = lastLocation.getLongitude();
 
+            //TODO - Adjust geofire to save Location objects or switch to Firebase Realtime DB without geofire
             // Save to Firebase DB
             geoFire.setLocation("CurrentLocation", new GeoLocation(latitude, longitude),
                     new GeoFire.CompletionListener() {
@@ -205,10 +210,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-//        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+        // TODO - Remove dummy favourite place and add list of real favourite places
+        // Add dummy favourite place to check geofence
+
+        LatLng favouritePlace = new LatLng(38.0000, 102.0000);
+        Log.d(TAG, "onMapReady: " + favouritePlace.latitude + " / " + favouritePlace.longitude);
+        mMap.addCircle(new CircleOptions()
+        .center(favouritePlace)
+        .radius(500)
+        .strokeColor(Color.parseColor("#C44F5F"))
+        .fillColor(Color.parseColor("#E0A3A4"))
+        .strokeWidth(5.0f));
+
+        Marker marker = mMap.addMarker(new MarkerOptions().position(favouritePlace).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_beenhere_black_24dp))
+                .title("FavouritePlace"));
+
+//         Add geoquery to this location
+//        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(favouritePlace.latitude, favouritePlace.longitude), 0.5f);
+
+
+
+
+
     }
 
     @Override
