@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.alicja.favouriteplacesapp.utils.NotificationUtils;
@@ -35,6 +36,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -64,6 +66,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DatabaseReference firebaseLocationsDB;
     private GeoFire geoFire;
 
+    //Vertical seekbar - for zoom function
+    private VerticalSeekBar verticalSeekBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +86,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Connect with Firebase
         firebaseLocationsDB = FirebaseDatabase.getInstance().getReference("Locations");
         geoFire = new GeoFire(firebaseLocationsDB);
+
+        // Add zoom function to vertical seekbar
+        verticalSeekBar = (VerticalSeekBar) findViewById(R.id.verticalSeekBar);
+        verticalSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
     }
 
@@ -155,7 +179,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     .title("Current Location"));
 
                             // Adjust camera
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 12.0f));
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15.0f));
                         }
                     });
 
@@ -217,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // TODO - Remove dummy favourite place and add list of real favourite places
         // Add dummy favourite place to check geofence
 
-        LatLng favouritePlace = new LatLng(38.0000, 102.0000);
+        LatLng favouritePlace = new LatLng(52.170599, 21.011495);
         Log.d(TAG, "onMapReady: " + favouritePlace.latitude + " / " + favouritePlace.longitude);
         mMap.addCircle(new CircleOptions()
         .center(favouritePlace)
