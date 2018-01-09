@@ -1,6 +1,7 @@
 package com.example.alicja.favouriteplacesapp.utils;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -19,6 +20,8 @@ public class NotificationUtils {
 
     private static final int NOTIFICATION_ID = 8285;
     private static final int PENDING_INTENT_ID = 4893;
+    public static final String NOTIFICATION_CHANNEL_ID = "com.example.alicja.favouriteplacesapp.FIRSTCHANNEL";
+    public static final String NOTIFICATION_CHANNEL_NAME = "Channel One";
 
 
     public static void showNotification(Context context, String message) {
@@ -27,17 +30,35 @@ public class NotificationUtils {
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        Notification.Builder notificationBuilder;
+
+        //Notification channel - to Android O
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            Log.i(TAG, "showNotification: preparing notification channel");
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, mNotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(R.color.favouriteMarkerFillColor);
+            notificationChannel.setShowBadge(true);
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+
+            mNotificationManager.createNotificationChannel(notificationChannel);
+
+            //For API>=26 notificationBuilder created with notification channel
+            notificationBuilder =
+                    new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
+        } else {
+            notificationBuilder =
+                    new Notification.Builder(context);
+        }
+
         Log.i(TAG, "showNotification: preparing notification");
-        Notification.Builder notificationBuilder =
-                new Notification.Builder(context)
-                        .setSmallIcon(R.drawable.ic_favorite_black_24dp)
+        notificationBuilder.setSmallIcon(R.drawable.ic_favorite_black_24dp)
                         .setColor(ContextCompat.getColor(context, R.color.favouriteMarkerStrokeColor))
                         .setContentTitle(NOTIFICATION_TITLE)
                         .setContentText(message)
                         .setContentIntent(getPendingIntent(context))
                         .setDefaults(Notification.DEFAULT_SOUND)
                         .setAutoCancel(true);
-
 
         Log.i(TAG, "showNotification: showing notification");
         mNotificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
