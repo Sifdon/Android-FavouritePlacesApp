@@ -2,7 +2,6 @@ package com.example.alicja.favouriteplacesapp;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -108,12 +107,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private boolean checkLocationPermissionsGranted() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return false;
-        }
-        return true;
+    private boolean checkPermission() {
+        return (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
     }
 
 
@@ -135,7 +131,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void showCurrentLocation() {
-        if (!checkLocationPermissionsGranted()) {
+        if (!checkPermission()) {
             //Runtime permission - request if the permission is not granted
             ActivityCompat.requestPermissions(this, new String[]{
                     Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -154,7 +150,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void displayLocation() {
-        if (!checkLocationPermissionsGranted()) {
+        if (!checkPermission()) {
             return;
         }
 
@@ -305,7 +301,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void setLocationUpdates() {
-        if (!checkLocationPermissionsGranted()) {
+        if (!checkPermission()) {
             return;
         }
 
