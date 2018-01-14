@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goToMap(View view){
-        Intent intent1 = new Intent(this, MapsActivity.class);
+        Intent intent1 = new Intent(this, PlacesActivity.class);
         startActivity(intent1);
     }
 }
