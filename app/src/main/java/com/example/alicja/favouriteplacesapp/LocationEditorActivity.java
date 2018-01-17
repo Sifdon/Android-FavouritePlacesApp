@@ -80,7 +80,7 @@ public class LocationEditorActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_product_editor, menu);
+        getMenuInflater().inflate(R.menu.menu_location_editor, menu);
         return true;
     }
 

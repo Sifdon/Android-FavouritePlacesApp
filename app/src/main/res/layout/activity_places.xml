@@ -8,19 +8,29 @@
 
     <!--GoogleMap fragment-->
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        android:name="com.google.android.gms.maps.MapFragment"
         android:id="@+id/map"
+        android:name="com.google.android.gms.maps.MapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></fragment>
+        android:layout_height="match_parent">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/addPlaceBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:clickable="true"
-        app:backgroundTint="@color/favouriteMarkerStrokeColor"
-        app:srcCompat="@drawable/ic_favorite_black_24dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/addPlaceBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:clickable="true"
+                app:backgroundTint="@color/favouriteMarkerStrokeColor"
+                app:srcCompat="@drawable/ic_favorite_black_24dp" />
+
+        </LinearLayout>
+    </fragment>
 
 
 </LinearLayout>
