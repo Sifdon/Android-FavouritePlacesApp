@@ -10,7 +10,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -25,7 +24,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -71,8 +69,6 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
         // Create instance of FusedLocationProviderClient
         mFusedLocationClient = getFusedLocationProviderClient(this);
 
-
-
         // Start location updates
         startLocationUpdates();
 
@@ -90,13 +86,6 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
         // Get last location
         getLastKnownLocation();
 
-
-        // Add a marker in Sydney, Australia,
-        // and move the map's camera to the same location.
-//        LatLng sydney = new LatLng(-33.852, 151.211);
-//        googleMap.addMarker(new MarkerOptions().position(sydney)
-//                .title("Marker in Sydney"));
-//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
     }
 
@@ -170,26 +159,17 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
         String msg = "Updated Location: " +
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onLocationChanged: " + msg);
 
-        // You can now create a LatLng Object for use with maps
+        // LatLng Object for use with maps
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        displayCurrentLocation(latLng);
+        showCurrentLocation(latLng);
 
     }
 
-    public void displayCurrentLocation(LatLng currentLatLng) {
+    public void showCurrentLocation(LatLng currentLatLng) {
         if(mMap == null) return;
-
-        // Add current location marker
-        currentLocationMarker = mMap
-                .addMarker(new MarkerOptions().position(currentLatLng)
-                        .title("Current Location"));
-
         // Center camera on current location
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15.0f));
-
-
     }
 }
