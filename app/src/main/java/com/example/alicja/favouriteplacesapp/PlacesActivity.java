@@ -23,7 +23,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnFailureListener;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -34,11 +33,11 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
 
     // MAP
     private GoogleMap mMap;
-    private Marker currentLocationMarker;
 
     // LOCATION
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest mLocationRequest;
+    private Location lastLocation;
 
 
     // LOCATION CONSTANTS
@@ -56,6 +55,8 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
         fab.setOnClickListener(
                 (view) -> {
                     Intent intent = new Intent(PlacesActivity.this, LocationEditorActivity.class);
+                    intent.putExtra("latitude", lastLocation.getLatitude());
+                    intent.putExtra("longitude", lastLocation.getLongitude());
                     startActivity(intent);
                 }
         );
@@ -110,6 +111,7 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
                     .addOnSuccessListener(location -> {
                         // GPS location can be null if GPS is switched off
                         if (location != null) {
+                            lastLocation = location;
                             onLocationChanged(location);
                         }
                     })
@@ -160,6 +162,9 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
         Log.d(TAG, "onLocationChanged: " + msg);
+
+        // Update last known location
+        lastLocation = location;
 
         // LatLng Object for use with maps
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
