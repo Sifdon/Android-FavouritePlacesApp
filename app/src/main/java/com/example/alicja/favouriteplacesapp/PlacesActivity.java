@@ -24,6 +24,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -39,25 +45,44 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
     private LocationRequest mLocationRequest;
     private Location lastLocation;
 
-
     // LOCATION CONSTANTS
     private long UPDATE_INTERVAL = 10000;
     private long FASTEST_INTERVAL = 2000;
     private static final int PERMISSION_REQUEST_CODE = 802;
+
+    // FIREBASE
+    private DatabaseReference databaseReference;
+    private FirebaseDatabase firebaseDatabase;
+    private ChildEventListener childEventListener;
+
+    // LIST WITH FAVOURITE LOCATIONS FOR GEOFENCE
+    private List<com.example.alicja.favouriteplacesapp.Location> favouritePlacesList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_places);
 
+        // Getting list of favourite places passed from MainActivity
+        favouritePlacesList = new ArrayList<>();
+        Intent intent = getIntent();
+        if(intent.getExtras() != null) {
+            Bundle bundle = intent.getExtras();
+            if(bundle.getParcelableArrayList("favouritePlaces") != null) {
+                favouritePlacesList = bundle.getParcelableArrayList("favouritePlaces");
+                Log.d(TAG, "onCreate: " + favouritePlacesList.size());
+            }
+        }
+
+
         // FAB for adding new favourite place
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.addPlaceBtn);
         fab.setOnClickListener(
                 (view) -> {
-                    Intent intent = new Intent(PlacesActivity.this, LocationEditorActivity.class);
-                    intent.putExtra("latitude", lastLocation.getLatitude());
-                    intent.putExtra("longitude", lastLocation.getLongitude());
-                    startActivity(intent);
+                    Intent intentToEditor = new Intent(PlacesActivity.this, LocationEditorActivity.class);
+                    intentToEditor.putExtra("latitude", lastLocation.getLatitude());
+                    intentToEditor.putExtra("longitude", lastLocation.getLongitude());
+                    startActivity(intentToEditor);
                 }
         );
 
@@ -83,11 +108,8 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
         if(checkPermission()) {
             googleMap.setMyLocationEnabled(true);
         }
-
         // Get last location
         getLastKnownLocation();
-
-
     }
 
     private boolean checkPermission() {
@@ -157,11 +179,6 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
     }
 
     public void onLocationChanged(Location location) {
-        // New location has now been determined
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        Log.d(TAG, "onLocationChanged: " + msg);
 
         // Update last known location
         lastLocation = location;

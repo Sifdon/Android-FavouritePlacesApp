@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,11 +21,8 @@ public class MainActivity extends AppCompatActivity {
 
     private DatabaseReference databaseReference;
     private FirebaseDatabase firebaseDatabase;
-    private ChildEventListener childEventListener;
 
     private List<com.example.alicja.favouriteplacesapp.Location> favouriteLocationsList;
-
-    private int counter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         databaseReference = firebaseDatabase.getReference("Places");
 
         //add listener to respond to changes in firebase DB with favourite locations and update list
+
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -59,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void goToMap(View view) {
         Intent intent1 = new Intent(this, PlacesActivity.class);
+
+        //pass the list of favourite places to placesActivity
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("favouritePlaces", (ArrayList<Location>)favouriteLocationsList);
+        intent1.putExtras(bundle);
         startActivity(intent1);
     }
 
