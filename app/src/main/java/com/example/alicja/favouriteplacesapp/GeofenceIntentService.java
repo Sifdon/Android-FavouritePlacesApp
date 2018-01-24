@@ -12,28 +12,18 @@ import com.google.android.gms.location.GeofencingEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Alicja on 24.01.2018.
- */
-
 public class GeofenceIntentService extends IntentService {
 
     private static final String TAG = "GeofenceTransitionsIS";
 
-    private static final String CHANNEL_ID = "channel_01";
-    private int notificationId = 0;
-    /**
-     * This constructor is required, and calls the super IntentService(String)
-     * constructor with the name for a worker thread.
-     */
     public GeofenceIntentService() {
-        // Use the TAG to name the worker thread.
         super(TAG);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
+
         // Get the transition type.
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
 
@@ -48,23 +38,17 @@ public class GeofenceIntentService extends IntentService {
             String geofenceTransitionDetails = getGeofenceTransitionDetails(geofenceTransition,
                     triggeringGeofences);
 
-            // Send notification and log the transition details.
-//            sendNotification(geofenceTransitionDetails);
+            // Send notification
             NotificationUtils.showNotification(getApplicationContext(), getNotificationTitle(geofenceTransition), geofenceTransitionDetails);
             Log.i(TAG, geofenceTransitionDetails);
-        } else {
-            // Log the error.
-            Log.e(TAG, "Intent failure"  + geofenceTransition);
         }
     }
 
     private String getGeofenceTransitionDetails(int geofenceTransition, List<Geofence> triggeringGeofences) {
 
-
-
-        // get the name of each geofence triggered
         ArrayList<String> triggeringGeofencesList = new ArrayList<>();
         for ( Geofence geofence : triggeringGeofences ) {
+            // Get location name for triggering geofence
             String locationTitle = geofence.getRequestId().substring(geofence.getRequestId().indexOf("***") + 3);
             triggeringGeofencesList.add(locationTitle);
         }
