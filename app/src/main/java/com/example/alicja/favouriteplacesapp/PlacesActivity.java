@@ -1,5 +1,6 @@
 package com.example.alicja.favouriteplacesapp;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -13,6 +14,8 @@ import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -66,6 +69,8 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
 
     // GEOFENCE
     private ArrayList<Geofence> mGeofenceList;
+    private GeofencingClient mGeofencingClient;
+    private PendingIntent mGeofencePendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +101,7 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
         });
 
         mGeofenceList = new ArrayList<>();
+        mGeofencingClient = LocationServices.getGeofencingClient(this);
 
 
         // FAB for adding new favourite place
@@ -160,14 +166,16 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
                     // removed after this period of time.
                     .setExpirationDuration(12 * 60 * 60 * 1000)
 
-                    // Set the transition types of interest. Alerts are only generated for these
-                    // transition. We track entry and exit transitions in this sample.
+                    // Set the transition types of interest.
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
                             Geofence.GEOFENCE_TRANSITION_EXIT)
 
                     // Create the geofence.
                     .build());
 
+            if (checkPermission()) {
+                mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent());
+            }
             Log.d(TAG, "addGeofencesToFavouriteLocations: geofence added for location " + location.getId());
         }
     }
@@ -175,7 +183,7 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
     private void addMarkersToFavouriteLocations() {
         for (com.example.alicja.favouriteplacesapp.Location location : favouritePlacesList) {
 
-            LatLng locationLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+            LatLng locationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             mMap.addCircle(new CircleOptions()
                     .center(locationLatLng)
                     .radius(location.getRadius())
@@ -183,11 +191,36 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
                     .fillColor(getColor(R.color.favouriteMarkerFillColor))
                     .strokeWidth(5.0f));
 
-            Marker marker = mMap.addMarker(new MarkerOptions().position(locationLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_beenhere_black_24dp))
-                    .title(location.getName()));
-
+            Marker marker = mMap
+                    .addMarker(new MarkerOptions()
+                            .position(locationLatLng)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_beenhere_black_24dp))
+                            .title(location.getName()));
         }
+    }
 
+    private PendingIntent getGeofencePendingIntent() {
+        // Reuse the PendingIntent if we already have it.
+        if (mGeofencePendingIntent != null) {
+            return mGeofencePendingIntent;
+        }
+        Intent intent = new Intent(this, GeofenceIntentService.class);
+        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private GeofencingRequest getGeofencingRequest() {
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+
+        // The INITIAL_TRIGGER_ENTER flag indicates that geofencing service should trigger a
+        // GEOFENCE_TRANSITION_ENTER notification when the geofence is added and if the device
+        // is already inside that geofence.
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+
+        // Add the geofences to be monitored by geofencing service.
+        builder.addGeofences(mGeofenceList);
+
+        // Return a GeofencingRequest.
+        return builder.build();
     }
 
 
@@ -233,7 +266,8 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL)
                 .setFastestInterval(FASTEST_INTERVAL)
-                .setSmallestDisplacement(1);;
+                .setSmallestDisplacement(1);
+        ;
 
         // Create LocationSettingsRequest object using location request
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(mLocationRequest);

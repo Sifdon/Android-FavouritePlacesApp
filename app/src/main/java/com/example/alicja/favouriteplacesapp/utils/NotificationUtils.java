@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.example.alicja.favouriteplacesapp.MapsActivity;
+import com.example.alicja.favouriteplacesapp.PlacesActivity;
 import com.example.alicja.favouriteplacesapp.R;
 
 public class NotificationUtils {
@@ -68,7 +68,7 @@ public class NotificationUtils {
     public static PendingIntent getPendingIntent(Context context) {
 
         //Intent opening the MapsActivity:
-        Intent mapsActivityIntent = new Intent(context, MapsActivity.class);
+        Intent mapsActivityIntent = new Intent(context, PlacesActivity.class);
 
         return PendingIntent.getActivity(
                 context,
