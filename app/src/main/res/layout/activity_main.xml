@@ -6,13 +6,28 @@
     android:layout_height="match_parent"
     tools:context="com.example.alicja.favouriteplacesapp.MainActivity">
 
-    <Button
+
+    <ir.sohreco.circularpulsingbutton.CircularPulsingButton
         android:id="@+id/mapBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="MAP"
+        android:layout_alignParentBottom="true"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerInParent="true"
+        app:cpb_text="MAP"
+        app:cpb_zoomOutScale="0.4"
+        app:cpb_zoomInScale="1.6"
+        app:cpb_animationDuration="100"
+        app:cpb_color="@color/favouriteMarkerStrokeColor"
         android:onClick="goToMap"/>
+
+    <ListView
+        android:id="@+id/locationListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/mapBtn"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:fadeScrollbars="false"/>
+
 
 </RelativeLayout>

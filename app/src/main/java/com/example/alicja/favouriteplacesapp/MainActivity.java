@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ListView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,17 +25,23 @@ public class MainActivity extends AppCompatActivity {
 
     private List<com.example.alicja.favouriteplacesapp.Location> favouriteLocationsList;
 
+    private ListView locationListView;
+    private LocationAdapter locationAdapter;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize message ListView
+        locationListView = (ListView) findViewById(R.id.locationListView);
 
         //setting up firebase database
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("Places");
 
         //add listener to respond to changes in firebase DB with favourite locations and update list
-
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -45,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Log.d(TAG, "onDataChange: " + favouriteLocationsList.size());
+                setListViewData();
             }
 
             @Override
@@ -62,6 +70,11 @@ public class MainActivity extends AppCompatActivity {
         bundle.putParcelableArrayList("favouritePlaces", (ArrayList<Location>)favouriteLocationsList);
         intent1.putExtras(bundle);
         startActivity(intent1);
+    }
+
+    public void setListViewData(){
+        locationAdapter = new LocationAdapter(this, R.layout.location_list_item, favouriteLocationsList);
+        locationListView.setAdapter(locationAdapter);
     }
 
 }
