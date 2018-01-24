@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+import static java.util.stream.Collectors.toList;
 
 public class PlacesActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -129,6 +130,17 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (favouritePlacesList != null) {
+            // Add geofences to all locations from favouritePlacesList
+            addGeofencesToFavouriteLocations();
+            // Draw markers
+//            addMarkersToFavouriteLocations();
+        }
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
@@ -143,11 +155,15 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
             // Add geofences to all locations from favouritePlacesList
             addGeofencesToFavouriteLocations();
             // Draw markers
-            addMarkersToFavouriteLocations();
+//            addMarkersToFavouriteLocations();
         }
     }
 
     private void addGeofencesToFavouriteLocations() {
+        if(mGeofenceList.size() > 0) {
+            removeGeofences();
+        }
+
         for (com.example.alicja.favouriteplacesapp.Location location : favouritePlacesList) {
 
             mGeofenceList.add(new Geofence.Builder()
@@ -175,13 +191,14 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
 
             if (checkPermission()) {
                 mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent());
+                addMarkerToFavouriteLocation(location);
+
             }
             Log.d(TAG, "addGeofencesToFavouriteLocations: geofence added for location " + location.getId());
         }
     }
 
-    private void addMarkersToFavouriteLocations() {
-        for (com.example.alicja.favouriteplacesapp.Location location : favouritePlacesList) {
+    private void addMarkerToFavouriteLocation(com.example.alicja.favouriteplacesapp.Location location) {
 
             LatLng locationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             mMap.addCircle(new CircleOptions()
@@ -196,7 +213,7 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
                             .position(locationLatLng)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_beenhere_black_24dp))
                             .title(location.getName()));
-        }
+
     }
 
     private PendingIntent getGeofencePendingIntent() {
@@ -221,6 +238,13 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
 
         // Return a GeofencingRequest.
         return builder.build();
+    }
+
+    private void removeGeofences() {
+        List<String> geofenceRequestIds = mGeofenceList.stream()
+                .map(Geofence::getRequestId)
+                .collect(toList());
+        mGeofencingClient.removeGeofences(geofenceRequestIds);
     }
 
 

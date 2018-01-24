@@ -1,17 +1,11 @@
 package com.example.alicja.favouriteplacesapp;
 
 import android.app.IntentService;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.example.alicja.favouriteplacesapp.utils.NotificationUtils;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
@@ -55,7 +49,8 @@ public class GeofenceIntentService extends IntentService {
                     triggeringGeofences);
 
             // Send notification and log the transition details.
-            sendNotification(geofenceTransitionDetails);
+//            sendNotification(geofenceTransitionDetails);
+            NotificationUtils.showNotification(getApplicationContext(), geofenceTransitionDetails);
             Log.i(TAG, geofenceTransitionDetails);
         } else {
             // Log the error.
@@ -79,31 +74,6 @@ public class GeofenceIntentService extends IntentService {
         return status + TextUtils.join( ", ", triggeringGeofencesList);
     }
 
-    private void sendNotification(String notificationDetails) {
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.app_name);
-            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
-            mNotificationManager.createNotificationChannel(mChannel);
-        }
-        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(notificationIntent);
-        PendingIntent notificationPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        mNotificationManager.notify(incrementNotificationId(), new NotificationCompat.Builder(this).setContentTitle(notificationDetails)
-                .setSmallIcon(R.drawable.ic_favorite_black_24dp)
-                .setColor(getColor(R.color.favouriteMarkerStrokeColor))
-                .setContentText("MIEJSCE")
-                .setContentIntent(notificationPendingIntent)
-                .setChannelId(CHANNEL_ID)
-                .setAutoCancel(true)
-                .build());
-    }
 
     private String getTransitionString(int transitionType) {
         switch (transitionType) {
