@@ -11,7 +11,6 @@ import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import com.example.alicja.favouriteplacesapp.utils.NotificationUtils;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -256,7 +255,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
             @Override
             public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
-                NotificationUtils.showNotification(getApplicationContext(), location.toString());
+//                NotificationUtils.showNotification(getApplicationContext(), location.toString());
             }
 
             @Override

@@ -50,7 +50,7 @@ public class GeofenceIntentService extends IntentService {
 
             // Send notification and log the transition details.
 //            sendNotification(geofenceTransitionDetails);
-            NotificationUtils.showNotification(getApplicationContext(), geofenceTransitionDetails);
+            NotificationUtils.showNotification(getApplicationContext(), getNotificationTitle(geofenceTransition), geofenceTransitionDetails);
             Log.i(TAG, geofenceTransitionDetails);
         } else {
             // Log the error.
@@ -60,10 +60,13 @@ public class GeofenceIntentService extends IntentService {
 
     private String getGeofenceTransitionDetails(int geofenceTransition, List<Geofence> triggeringGeofences) {
 
-        // get the ID of each geofence triggered
+
+
+        // get the name of each geofence triggered
         ArrayList<String> triggeringGeofencesList = new ArrayList<>();
         for ( Geofence geofence : triggeringGeofences ) {
-            triggeringGeofencesList.add( geofence.getRequestId() );
+            String locationTitle = geofence.getRequestId().substring(geofence.getRequestId().indexOf("***") + 3);
+            triggeringGeofencesList.add(locationTitle);
         }
 
         String status = null;
@@ -75,18 +78,14 @@ public class GeofenceIntentService extends IntentService {
     }
 
 
-    private String getTransitionString(int transitionType) {
-        switch (transitionType) {
-            case Geofence.GEOFENCE_TRANSITION_ENTER:
-                return "ENTERED";
-            case Geofence.GEOFENCE_TRANSITION_EXIT:
-                return "EXITED";
-            default:
-                return "UNKNOWN";
-        }
+    private String getNotificationTitle(int geofenceTransition) {
+
+        String title = null;
+        if ( geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER )
+            title = "You entered one of your favourite locations! ";
+        else if ( geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT )
+            title = "You are no longer in the area of favourite location. ";
+        return title;
     }
 
-    private int incrementNotificationId(){
-        return notificationId++;
-    }
 }

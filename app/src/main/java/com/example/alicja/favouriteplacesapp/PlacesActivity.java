@@ -167,9 +167,9 @@ public class PlacesActivity extends FragmentActivity implements OnMapReadyCallba
         for (com.example.alicja.favouriteplacesapp.Location location : favouritePlacesList) {
 
             mGeofenceList.add(new Geofence.Builder()
-                    // Set the request ID of the geofence. This is a string to identify this
-                    // geofence.
-                    .setRequestId(location.getId())
+                    // Set the request ID of the geofence.
+                    // Request ID is the Location ID and Location name separeted by "***"
+                    .setRequestId(location.getId() + "***" + location.getName())
 
                     // Set the circular region of this geofence.
                     .setCircularRegion(

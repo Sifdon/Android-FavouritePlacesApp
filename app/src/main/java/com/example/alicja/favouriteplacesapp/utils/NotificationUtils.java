@@ -16,7 +16,7 @@ public class NotificationUtils {
 
     private static final String TAG = "NotificationUtils";
 
-    private static final String NOTIFICATION_TITLE = "One of your favourite places is nearby!";
+//    private static final String NOTIFICATION_TITLE = "One of your favourite places is nearby!";
 
     private static final int NOTIFICATION_ID = 8285;
     private static final int PENDING_INTENT_ID = 4893;
@@ -24,7 +24,7 @@ public class NotificationUtils {
     public static final String NOTIFICATION_CHANNEL_NAME = "Channel One";
 
 
-    public static void showNotification(Context context, String message) {
+    public static void showNotification(Context context, String title, String message) {
 
         Log.i(TAG, "showNotification: getting the notification manager");
         NotificationManager mNotificationManager =
@@ -54,7 +54,7 @@ public class NotificationUtils {
         Log.i(TAG, "showNotification: preparing notification");
         notificationBuilder.setSmallIcon(R.drawable.ic_favorite_black_24dp)
                         .setColor(ContextCompat.getColor(context, R.color.favouriteMarkerStrokeColor))
-                        .setContentTitle(NOTIFICATION_TITLE)
+                        .setContentTitle(title)
                         .setContentText(message)
                         .setContentIntent(getPendingIntent(context))
                         .setDefaults(Notification.DEFAULT_SOUND)
